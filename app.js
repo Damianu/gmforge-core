@@ -19,8 +19,8 @@
     var async = require('async');
 
     var client = natUpnp.createClient();
-    var privatePort = 30000;
-    var publicPort = Math.ceil(5536 + privatePort);
+    var privatePort = 80;
+    var publicPort = 80;
 
     var externalIP;
 

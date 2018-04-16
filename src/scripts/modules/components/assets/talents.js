@@ -125,33 +125,54 @@ sync.render("ui_renderTalent", function(obj, app, scope){
       var level = $("<text>").appendTo(talentDiv);
       level.append(sync.modifier(talentData, "rank"));
     }
-
-    talentDiv.click(function(){
-      var frame = $("<div>");
-      frame.addClass("flexcolumn flex");
-
-      var tRef = $(this).attr("index");
-      var talentData = scope.talentData;
-
+    var frame;
+    var parentDiv = div;
+    if(talentData.expanded)
+    {
       var viewTalent = sync.obj("viewTalent");
       viewTalent.data = duplicate(game.templates.page);
       viewTalent.data._t = "t";
       viewTalent.data.info.name = sync.newValue("Name", duplicate(talentData.name));
       viewTalent.data.info.img = sync.newValue("Img", null);
       viewTalent.data.info.notes = sync.newValue("Notes", duplicate(talentData.current));
+      frame = $("<div>").appendTo(parentDiv);
+      frame.attr("id", "preview");
+      util.processPage(sync.rawVal(viewTalent.data.info.notes), obj, app, scope).appendTo(frame);
+      frame.addClass("flexrow");
+      frame.css("flex","0 0 100%");
+      frame.click(function(){
+        talentData.expanded = false
+        frame.remove();
+      });
+    }
+    talentDiv.click(function(){
+      var tRef = $(this).attr("index");
+      var talentData = scope.talentData;
 
-      var newApp  = sync.newApp("ui_renderPage").appendTo(frame);
-      newApp.attr("viewOnly", true);
-      viewTalent.addApp(newApp);
-
-      var pop = ui_popOut({
-        target : $("body"),
-        id : "view-talent",
-        prompt : true,
-        title : sync.rawVal(talentData.name),
-        style : {width : "400px", height : "400px"}
-      }, frame);
-      pop.resizable();
+      talentData.expanded = !talentData.expanded
+      //obj.sync("updateAsset");
+      if(talentData.expanded)
+      {
+        var viewTalent = sync.obj("viewTalent");
+        viewTalent.data = duplicate(game.templates.page);
+        viewTalent.data._t = "t";
+        viewTalent.data.info.name = sync.newValue("Name", duplicate(talentData.name));
+        viewTalent.data.info.img = sync.newValue("Img", null);
+        viewTalent.data.info.notes = sync.newValue("Notes", duplicate(talentData.current));
+        frame = $("<div>").appendTo(parentDiv);
+        frame.attr("id", "preview");
+        util.processPage(sync.rawVal(viewTalent.data.info.notes), obj, app, scope).appendTo(frame);
+        frame.addClass("flexrow");
+        frame.css("flex","0 0 100%");
+        frame.click(function(){
+          talentData.expanded = false
+          frame.remove();
+        });
+      }
+      else
+      {
+        frame.remove();
+      }
     });
   }
 
@@ -187,7 +208,7 @@ sync.render("ui_characterTalentList", function(obj, app, scope) {
       if (scope.minimized) {
         //talentCont.addClass("subtitle");
       }
-      if (!scope.viewOnly) {
+      if (!scope.viewOnly&&false) {
         var key = $("<text>").appendTo(talentCont);
         key.addClass("subtitle lrpadding flexmiddle");
         key.attr("title", "@c.talents."+index);
@@ -221,36 +242,13 @@ sync.render("ui_characterTalentList", function(obj, app, scope) {
           });
         }
 
-        talentCont.addClass("flexbetween hover2");
-        talentCont.css("cursor", "pointer");
-        talentCont.attr("index", index);
-        talentCont.click(function(){
-          var frame = $("<div>");
-          frame.addClass("flexcolumn flex");
-
-          var tRef = $(this).attr("index");
-          var talentData = data.talents[tRef];
-
-          var viewTalent = sync.obj("viewTalent");
-          viewTalent.data = duplicate(game.templates.page);
-          viewTalent.data._t = "t";
-          viewTalent.data.info.name = sync.newValue("Name", duplicate(talentData.name));
-          viewTalent.data.info.img = sync.newValue("Img", null);
-          viewTalent.data.info.notes = sync.newValue("Notes", duplicate(talentData.current));
-
-          var newApp  = sync.newApp("ui_renderPage").appendTo(frame);
-          newApp.attr("viewOnly", true);
-          viewTalent.addApp(newApp);
-
-          var pop = ui_popOut({
-            target : $("body"),
-            id : "view-talent",
-            title : sync.rawVal(talentData.name),
-            style : {width : "400px", height : "400px"}
-          }, frame);
-          pop.resizable();
-        });
       }
+      talentCont.addClass("flexrow flexwrap hover2");
+      talentCont.css("cursor", "pointer");
+      talentCont.attr("index", index);
+      talentCont.click(function(){
+
+      });
 
       sync.render("ui_renderTalent")(obj, app, {talentData: talentData, viewOnly: true, minimized : scope.minimized}).appendTo(talentCont);
 

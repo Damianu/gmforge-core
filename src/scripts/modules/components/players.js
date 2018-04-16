@@ -25,7 +25,7 @@ sync.render("ui_players", function(obj, app, scope) {
     handle : ".playerPlate",
     connectWith : ".dropContent",
     start : function(ev, ui) {
-      $(ui.item).css("height", scope.height || "50px");
+      $(ui.item).css("height", scope.height || "32px");
     }
   });
 
@@ -33,7 +33,7 @@ sync.render("ui_players", function(obj, app, scope) {
 
   for (var id in data) {
     if (id != getCookie("UserID")) {
-      sync.render("ui_playerToken")(obj, app, {userID : id, centered : true, height : scope.height}).appendTo(playerList);
+      sync.render("ui_playerToken")(obj, app, {userID : id, centered : true, height : "32px"}).appendTo(playerList);
     }
   }
 
@@ -317,8 +317,27 @@ sync.render("ui_playerToken", function(obj, app, scope) {
           }, newApp);
           pop.resizable();
         }},
+        {name : "Quick Actions", click : function(){
+          var actionObj = sync.dummyObj();
+
+          var char = getPlayerCharacter(playerPlate.attr("UserID"))
+          actionObj.data = {context : {c : char.id()}};
+
+          game.locals["actions"] = game.locals["actions"] || [];
+          game.locals["actions"].push(actionObj);
+
+          var pop = ui_popOut({
+            target : playerPlate,
+            minimize : true,
+            dragThickness : "0.5em",
+            title : "Actions " + sync.rawVal(char.data.info.name),
+            align : "top",
+            style : {"width" : "350px", "height":"450"}
+          }, sync.render("ui_hotActions")(char, app, scope));
+          pop.resizable();
+        }},
         {name : "Sheet", click : function(){
-          var content = sync.newApp("ui_characterSheet");
+          var content = sync.newApp("ui_characterSheet", playerPlate);
           getPlayerCharacter(playerPlate.attr("UserID")).addApp(content);
           var popOut = ui_popOut({
             target: playerPlate,

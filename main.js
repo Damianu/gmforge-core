@@ -25,7 +25,7 @@ app.on('ready', function () {
         //  'node-integration': false // otherwise various client-side things may break
     });
     appIcon.setToolTip('GM Forge');
-    mainWindow.loadURL('http://localhost:30000/');
+    mainWindow.loadURL('http://localhost/');
     mainWindow.webContents.on('new-window', function(e, url) {
       e.preventDefault();
       require('electron').shell.openExternal(url);
